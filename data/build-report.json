@@ -1,23 +1,133 @@
 {
   "min_score": 5,
   "emotions": {
-    "verdriet": {"candidates": 338, "accepted": 120, "rejected_weak": 217, "duplicates_removed": 1, "capped": 212, "by_collection": {"سنن الترمذي": 21, "صحيح مسلم": 16, "صحيح البخاري": 83}},
-    "angst": {"candidates": 347, "accepted": 120, "rejected_weak": 227, "duplicates_removed": 0, "capped": 210, "by_collection": {"صحيح مسلم": 42, "صحيح البخاري": 44, "سنن الترمذي": 34}},
-    "boos": {"candidates": 17, "accepted": 16, "rejected_weak": 1, "duplicates_removed": 0, "capped": 0, "by_collection": {"سنن الترمذي": 6, "صحيح البخاري": 6, "صحيح مسلم": 4}},
-    "eenzaam": {"candidates": 829, "accepted": 120, "rejected_weak": 708, "duplicates_removed": 1, "capped": 669, "by_collection": {"سنن الترمذي": 119, "صحيح البخاري": 1}},
-    "blij": {"candidates": 83, "accepted": 74, "rejected_weak": 9, "duplicates_removed": 0, "capped": 0, "by_collection": {"سنن الترمذي": 15, "صحيح البخاري": 45, "صحيح مسلم": 14}},
-    "dankbaar": {"candidates": 168, "accepted": 120, "rejected_weak": 48, "duplicates_removed": 0, "capped": 44, "by_collection": {"سنن الترمذي": 41, "صحيح مسلم": 3, "صحيح البخاري": 76}},
-    "spijt": {"candidates": 507, "accepted": 120, "rejected_weak": 385, "duplicates_removed": 2, "capped": 372, "by_collection": {"صحيح البخاري": 74, "سنن الترمذي": 34, "صحيح مسلم": 12}},
-    "moe": {"candidates": 84, "accepted": 84, "rejected_weak": 0, "duplicates_removed": 0, "capped": 0, "by_collection": {"صحيح البخاري": 43, "صحيح مسلم": 26, "سنن الترمذي": 15}},
-    "hoop": {"candidates": 157, "accepted": 120, "rejected_weak": 36, "duplicates_removed": 1, "capped": 29, "by_collection": {"صحيح البخاري": 72, "سنن الترمذي": 24, "صحيح مسلم": 24}},
-    "rust": {"candidates": 81, "accepted": 81, "rejected_weak": 0, "duplicates_removed": 0, "capped": 0, "by_collection": {"صحيح مسلم": 27, "صحيح البخاري": 46, "سنن الترمذي": 8}}
+    "verdriet": {
+      "candidates": 338,
+      "accepted": 120,
+      "rejected_weak": 216,
+      "duplicates_removed": 2,
+      "capped": 211,
+      "by_collection": {
+        "سنن الترمذي": 21,
+        "صحيح مسلم": 16,
+        "صحيح البخاري": 83
+      }
+    },
+    "angst": {
+      "candidates": 347,
+      "accepted": 120,
+      "rejected_weak": 227,
+      "duplicates_removed": 0,
+      "capped": 211,
+      "by_collection": {
+        "صحيح مسلم": 42,
+        "صحيح البخاري": 44,
+        "سنن الترمذي": 34
+      }
+    },
+    "boos": {
+      "candidates": 17,
+      "accepted": 15,
+      "rejected_weak": 1,
+      "duplicates_removed": 1,
+      "capped": 0,
+      "by_collection": {
+        "سنن الترمذي": 6,
+        "صحيح البخاري": 6,
+        "صحيح مسلم": 3
+      }
+    },
+    "eenzaam": {
+      "candidates": 17,
+      "accepted": 16,
+      "rejected_weak": 1,
+      "duplicates_removed": 0,
+      "capped": 0,
+      "by_collection": {
+        "صحيح مسلم": 4,
+        "صحيح البخاري": 8,
+        "سنن الترمذي": 4
+      }
+    },
+    "blij": {
+      "candidates": 83,
+      "accepted": 74,
+      "rejected_weak": 9,
+      "duplicates_removed": 0,
+      "capped": 0,
+      "by_collection": {
+        "سنن الترمذي": 16,
+        "صحيح البخاري": 45,
+        "صحيح مسلم": 13
+      }
+    },
+    "dankbaar": {
+      "candidates": 168,
+      "accepted": 120,
+      "rejected_weak": 48,
+      "duplicates_removed": 0,
+      "capped": 45,
+      "by_collection": {
+        "سنن الترمذي": 42,
+        "صحيح مسلم": 3,
+        "صحيح البخاري": 75
+      }
+    },
+    "spijt": {
+      "candidates": 507,
+      "accepted": 120,
+      "rejected_weak": 385,
+      "duplicates_removed": 2,
+      "capped": 371,
+      "by_collection": {
+        "صحيح البخاري": 74,
+        "سنن الترمذي": 34,
+        "صحيح مسلم": 12
+      }
+    },
+    "moe": {
+      "candidates": 84,
+      "accepted": 83,
+      "rejected_weak": 0,
+      "duplicates_removed": 1,
+      "capped": 0,
+      "by_collection": {
+        "صحيح البخاري": 42,
+        "صحيح مسلم": 26,
+        "سنن الترمذي": 15
+      }
+    },
+    "hoop": {
+      "candidates": 157,
+      "accepted": 120,
+      "rejected_weak": 34,
+      "duplicates_removed": 3,
+      "capped": 27,
+      "by_collection": {
+        "صحيح البخاري": 73,
+        "سنن الترمذي": 24,
+        "صحيح مسلم": 23
+      }
+    },
+    "rust": {
+      "candidates": 81,
+      "accepted": 80,
+      "rejected_weak": 0,
+      "duplicates_removed": 1,
+      "capped": 0,
+      "by_collection": {
+        "صحيح مسلم": 26,
+        "صحيح البخاري": 46,
+        "سنن الترمذي": 8
+      }
+    }
   },
   "totals": {
     "source_rows_scanned": 11269,
-    "unique_hadiths_in_index": 927,
-    "assignments": 975,
-    "below_threshold": 8956,
-    "duplicates_removed": 5
+    "unique_hadiths_in_index": 832,
+    "assignments": 868,
+    "below_threshold": 9647,
+    "duplicates_removed": 10
   },
   "validation_errors": []
 }
