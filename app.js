@@ -23,36 +23,58 @@ let currentEmotion = null;
 const cache = {};
 const bags = {};
 
+function shuffle(list) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = a[i];
+    a[i] = a[j];
+    a[j] = tmp;
+  }
+  return a;
+}
+
 function quranPool(id) {
   return ((typeof TEXTS !== "undefined" && TEXTS[id]) || [])
     .filter((x) => x.arabic && x.arabic.trim())
-    .map((x) => ({
-      text: x.arabic.trim(),
-      collection: "القرآن",
-      number: (x.ref || "").replace(/^Koran\s*/i, ""),
-      ref: x.ref || ""
-    }));
+    .map((x) => {
+      const ayah = (x.ref || "").replace(/^Koran\s*/i, "").trim();
+      return {
+        type: "quran",
+        text: x.arabic.trim(),
+        collection: "القرآن",
+        number: ayah,
+        ref: ayah ? ("القرآن " + ayah) : "القرآن"
+      };
+    });
 }
 
-function keyOf(item) {
-  return (item.text || "").replace(/[\u064B-\u065F\u0670]/g, "").slice(0, 90);
+function keyOf(text) {
+  return (text || "").replace(/[\u064B-\u065F\u0670]/g, "").slice(0, 90);
 }
 
 function mergePool(id, hadiths) {
   const out = [];
   const seen = new Set();
-  for (const item of quranPool(id).concat(hadiths || [])) {
-    const text = (item.text || item.arabic || "").trim();
-    if (!text) continue;
-    const k = keyOf({ text });
+  const mappedHadiths = (hadiths || []).map((item) => ({
+    type: "hadith",
+    text: (item.text || "").trim(),
+    collection: item.collection || "",
+    number: item.number || "",
+    ref: ((item.collection || "") + (item.number ? " " + item.number : "")).trim()
+  }));
+  for (const item of quranPool(id).concat(mappedHadiths)) {
+    if (!item.text) continue;
+    const k = item.type + ":" + keyOf(item.text);
     if (seen.has(k)) continue;
     seen.add(k);
-    const collection = item.collection || "";
-    const number = item.number || "";
-    const ref = item.ref || (collection ? collection + (number ? " " + number : "") : "");
-    out.push({ text, collection, number, ref });
+    out.push(item);
   }
   return out;
+}
+
+function refillBag(id) {
+  bags[id] = shuffle(cache[id] || []);
 }
 
 async function loadEmotionPool(id) {
@@ -65,16 +87,15 @@ async function loadEmotionPool(id) {
     console.error(id, err);
   }
   cache[id] = mergePool(id, hadiths);
-  bags[id] = cache[id].slice();
+  refillBag(id);
   return cache[id];
 }
 
 function takeFromBag(id) {
   const pool = cache[id] || [];
   if (!pool.length) return null;
-  if (!bags[id] || bags[id].length === 0) bags[id] = pool.slice();
-  const i = Math.floor(Math.random() * bags[id].length);
-  return bags[id].splice(i, 1)[0];
+  if (!bags[id] || bags[id].length === 0) refillBag(id);
+  return bags[id].pop();
 }
 
 EMOTIONS.forEach((emo) => {
