@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emoties — een vers of hadith voor jou</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <main>
+    <header>
+      <p class="kicker">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+      <h1>Hoe voel je je?</h1>
+      <p class="lead">Kies een emotie. Elke keer verschijnt een andere aya of hadith die je kan steunen.</p>
+    </header>
+
+    <section class="emotions" id="emotions" aria-label="Emoties"></section>
+
+    <section class="card hidden" id="result" aria-live="polite">
+      <button class="close" id="close" aria-label="Sluiten">×</button>
+      <p class="emotion-label" id="result-emotion"></p>
+      <p class="arabic" id="arabic" dir="rtl" lang="ar"></p>
+      <p class="text" id="text"></p>
+      <p class="ref" id="ref"></p>
+      <button class="again" id="again">Nog een andere</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>Eenvoudige herinnering. Geen fatwa. Koran- en hadithteksten zijn verkort weergegeven ter steun.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
