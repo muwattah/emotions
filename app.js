@@ -11,34 +11,6 @@ const NAMES = {
   rust: "سكينة"
 };
 
-const KEYS = {
-  verdriet: ["لا تحزن", "لا تهنوا", "حزن", "مصيب", "يبكي", "بكى", "صابر", "ما يصيب المسلم"],
-  angst: ["لا تخف", "لا تخاف", "حسبنا الله", "الهم", "فزع", "وجل", "توكل"],
-  boos: ["لا تغضب", "الغضب", "كظم", "الغيظ", "يملك نفسه"],
-  eenzaam: ["ما ودعك", "اني قريب", "اجيب دعوة", "غريب", "انا معه"],
-  blij: ["فرح", "تبسم", "بوجه طلق", "فليفرحوا"],
-  dankbaar: ["شكر", "الحمد لله", "اشكر", "نعمتان"],
-  spijt: ["توب", "استغفر", "لا تقنطوا", "التائب", "يغفر"],
-  moe: ["يسروا", "الدين يسر", "لا يكلف", "اليسر", "نصب"],
-  hoop: ["لا تيأس", "لا تقنط", "مخرجا", "رحمتي", "فرج"],
-  rust: ["تطمئن", "السكينة", "سكينة", "ذكر الله"]
-};
-
-const SOURCES = [
-  {
-    name: "صحيح البخاري",
-    url: "https://cdn.jsdelivr.net/gh/mhashim6/Open-Hadith-Data@1515f6cba21efed20d8916bf55acef1dffa0d2d5/Sahih_Al-Bukhari/sahih_al-bukhari_ahadith.utf8.csv"
-  },
-  {
-    name: "صحيح مسلم",
-    url: "https://cdn.jsdelivr.net/gh/mhashim6/Open-Hadith-Data@1515f6cba21efed20d8916bf55acef1dffa0d2d5/Sahih_Muslim/sahih_muslim_ahadith.utf8.csv"
-  },
-  {
-    name: "سنن الترمذي",
-    url: "https://cdn.jsdelivr.net/gh/mhashim6/Open-Hadith-Data@1515f6cba21efed20d8916bf55acef1dffa0d2d5/Sunan_Al-Tirmidhi/sunan_al-tirmidhi_ahadith.utf8.csv"
-  }
-];
-
 const grid = document.getElementById("emotions");
 const result = document.getElementById("result");
 const resultEmotion = document.getElementById("result-emotion");
@@ -46,49 +18,63 @@ const arabicEl = document.getElementById("arabic");
 const refEl = document.getElementById("ref");
 const againBtn = document.getElementById("again");
 const closeBtn = document.getElementById("close");
-const statusEl = document.getElementById("status");
 
 let currentEmotion = null;
-const lastIndex = {};
-const extra = {};
+const cache = {};
+const bags = {};
 
-function norm(s) {
-  return (s || "")
-    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
-    .replace(/[أإآ]/g, "ا")
-    .replace(/ة/g, "ه")
-    .replace(/ى/g, "ي");
-}
-
-function parseCsv(text) {
-  const out = [];
-  const re = /^"([^"]*)","([\s\S]*?)"\s*$/;
-  for (const line of text.split(/\r?\n/)) {
-    if (!line) continue;
-    const m = line.match(re);
-    if (m) out.push([m[1], m[2].replace(/\s+/g, " ").trim()]);
-  }
-  return out;
-}
-
-function seedPool(id) {
-  return ((TEXTS[id] || [])
+function quranPool(id) {
+  return ((typeof TEXTS !== "undefined" && TEXTS[id]) || [])
     .filter((x) => x.arabic && x.arabic.trim())
-    .map((x) => ({ arabic: x.arabic.trim(), ref: x.ref || "" })));
+    .map((x) => ({
+      text: x.arabic.trim(),
+      collection: "القرآن",
+      number: (x.ref || "").replace(/^Koran\s*/i, ""),
+      ref: x.ref || ""
+    }));
 }
 
-function poolFor(id) {
-  const a = seedPool(id);
-  const b = extra[id] || [];
-  const seen = new Set();
+function keyOf(item) {
+  return (item.text || "").replace(/[\u064B-\u065F\u0670]/g, "").slice(0, 90);
+}
+
+function mergePool(id, hadiths) {
   const out = [];
-  for (const item of a.concat(b)) {
-    const key = item.arabic.slice(0, 90);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(item);
+  const seen = new Set();
+  for (const item of quranPool(id).concat(hadiths || [])) {
+    const text = (item.text || item.arabic || "").trim();
+    if (!text) continue;
+    const k = keyOf({ text });
+    if (seen.has(k)) continue;
+    seen.add(k);
+    const collection = item.collection || "";
+    const number = item.number || "";
+    const ref = item.ref || (collection ? collection + (number ? " " + number : "") : "");
+    out.push({ text, collection, number, ref });
   }
   return out;
+}
+
+async function loadEmotionPool(id) {
+  if (cache[id]) return cache[id];
+  let hadiths = [];
+  try {
+    const res = await fetch("data/index/" + id + ".json");
+    if (res.ok) hadiths = await res.json();
+  } catch (err) {
+    console.error(id, err);
+  }
+  cache[id] = mergePool(id, hadiths);
+  bags[id] = cache[id].slice();
+  return cache[id];
+}
+
+function takeFromBag(id) {
+  const pool = cache[id] || [];
+  if (!pool.length) return null;
+  if (!bags[id] || bags[id].length === 0) bags[id] = pool.slice();
+  const i = Math.floor(Math.random() * bags[id].length);
+  return bags[id].splice(i, 1)[0];
 }
 
 EMOTIONS.forEach((emo) => {
@@ -101,24 +87,13 @@ EMOTIONS.forEach((emo) => {
   grid.appendChild(btn);
 });
 
-function pickIndex(list, key) {
-  if (!list || list.length <= 1) return 0;
-  let i;
-  do {
-    i = Math.floor(Math.random() * list.length);
-  } while (i === lastIndex[key]);
-  lastIndex[key] = i;
-  return i;
-}
-
-function showText(id, name, face) {
+async function showText(id, name, face) {
   currentEmotion = { id, name, face };
-  const list = poolFor(id);
-  if (!list.length) return;
-  const i = pickIndex(list, id);
-  const item = list[i];
+  await loadEmotionPool(id);
+  const item = takeFromBag(id);
+  if (!item) return;
   resultEmotion.textContent = `${face} ${name}`;
-  arabicEl.textContent = item.arabic;
+  arabicEl.textContent = item.text;
   arabicEl.style.display = "block";
   refEl.textContent = item.ref || "";
   result.classList.remove("hidden");
@@ -133,32 +108,3 @@ againBtn.addEventListener("click", () => {
 closeBtn.addEventListener("click", () => {
   result.classList.add("hidden");
 });
-
-async function loadBooks() {
-  statusEl.textContent = "جاري تحميل الأحاديث...";
-  Object.keys(NAMES).forEach((k) => (extra[k] = []));
-  let total = 0;
-  for (const src of SOURCES) {
-    try {
-      const res = await fetch(src.url);
-      const text = await res.text();
-      const rows = parseCsv(text);
-      for (const [num, body] of rows) {
-        if (!body || body.length < 40 || body.length > 800) continue;
-        const n = norm(body);
-        for (const [emo, words] of Object.entries(KEYS)) {
-          if (words.some((w) => n.includes(norm(w)))) {
-            extra[emo].push({ arabic: body, ref: src.name + " " + num });
-          }
-        }
-      }
-      total += rows.length;
-    } catch (err) {
-      console.error(src.name, err);
-    }
-  }
-  const counts = Object.entries(extra).map(([k, v]) => `${NAMES[k]} ${v.length}`).join(" · ");
-  statusEl.textContent = total ? ("تم التحميل: " + counts) : "تعذر تحميل الملفات، تُعرض الآيات المحفوظة فقط.";
-}
-
-loadBooks();

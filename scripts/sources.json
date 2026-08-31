@@ -1,0 +1,21 @@
+{
+  "commit": "1515f6cba21efed20d8916bf55acef1dffa0d2d5",
+  "base": "https://raw.githubusercontent.com/mhashim6/Open-Hadith-Data/{commit}",
+  "collections": [
+    {
+      "id": "bukhari",
+      "name": "صحيح البخاري",
+      "csv": "Sahih_Al-Bukhari/sahih_al-bukhari_ahadith_mushakkala_mufassala.utf8.csv"
+    },
+    {
+      "id": "muslim",
+      "name": "صحيح مسلم",
+      "csv": "Sahih_Muslim/sahih_muslim_ahadith_mushakkala_mufassala.utf8.csv"
+    },
+    {
+      "id": "tirmidhi",
+      "name": "سنن الترمذي",
+      "csv": "Sunan_Al-Tirmidhi/sunan_al-tirmidhi_ahadith_mushakkala_mufassala.utf8.csv"
+    }
+  ]
+}
