@@ -32,8 +32,9 @@ function pickIndex(list, key) {
 function showText(id, name, face) {
   currentEmotion = { id, name, face };
   const list = TEXTS[id];
-  const item = list[pickIndex(list, id)];
-  resultEmotion.textContent = `${face} ${name}`;
+  const i = pickIndex(list, id);
+  const item = list[i];
+  resultEmotion.textContent = `${face} ${name} · ${i + 1}/${list.length}`;
   arabicEl.textContent = item.arabic || "";
   arabicEl.style.display = item.arabic ? "block" : "none";
   textEl.textContent = item.text;
