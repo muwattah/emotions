@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Emoties — een vers of hadith voor jou</title>
+  <title>المشاعر</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,28 +14,22 @@
   <main>
     <header>
       <p class="kicker">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
-      <h1>Hoe voel je je?</h1>
-      <p class="lead">Kies een emotie. Elke keer verschijnt een andere aya of hadith die je kan steunen.</p>
+      <h1>كيف تشعر الآن؟</h1>
+      <p class="lead">اختر شعورًا، يظهر لك آية أو حديث.</p>
     </header>
 
-    <section class="emotions" id="emotions" aria-label="Emoties"></section>
+    <section class="emotions" id="emotions" aria-label="المشاعر"></section>
 
     <section class="card hidden" id="result" aria-live="polite">
-      <button class="close" id="close" aria-label="Sluiten">×</button>
+      <button class="close" id="close" aria-label="إغلاق">×</button>
       <p class="emotion-label" id="result-emotion"></p>
       <p class="arabic" id="arabic" dir="rtl" lang="ar"></p>
-      <p class="text" id="text"></p>
       <p class="ref" id="ref"></p>
-      <button class="again" id="again">Nog een andere</button>
+      <button class="again" id="again">حديث أو آية أخرى</button>
     </section>
   </main>
 
-  <footer>
-    <p>Eenvoudige herinnering. Geen fatwa. Koran- en hadithteksten zijn verkort weergegeven ter steun.</p>
-  </footer>
-
   <script src="data.js"></script>
-  <script src="data2.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
