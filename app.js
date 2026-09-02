@@ -34,6 +34,70 @@ function shuffle(list) {
   return a;
 }
 
+function stripTashkeel(s) {
+  return (s || "").replace(/[\u064B-\u065F\u0670]/g, "");
+}
+
+function extractMatn(text) {
+  if (!text) return "";
+  let t = text.trim();
+
+  const cutAfter = [
+    "قَالَ أَبُو عِيسَى",
+    "قال أبو عيسى",
+    "هَذَا حَدِيثٌ",
+    "هذا حديث",
+    "وَفِي الْبَاب",
+    "وفي الباب"
+  ];
+  for (const m of cutAfter) {
+    const i = t.indexOf(m);
+    if (i > 40) t = t.slice(0, i).trim();
+  }
+
+  const starts = [
+    "قَالَ رَسُولُ اللَّهِ",
+    "قال رسول الله",
+    "قَالَ النَّبِيُّ",
+    "قال النبي",
+    "أَنَّ رَسُولَ اللَّهِ",
+    "أن رسول الله",
+    "أَنَّ النَّبِيَّ",
+    "أن النبي",
+    "سَمِعْتُ رَسُولَ اللَّهِ",
+    "سمعت رسول الله",
+    "سَمِعْتُ النَّبِيَّ",
+    "سمعت النبي",
+    "عَنِ النَّبِيِّ",
+    "عن النبي",
+    "عَنْ رَسُولِ اللَّهِ",
+    "عن رسول الله",
+    "يَقُولُ اللَّهُ",
+    "يقول الله",
+    "قَالَ اللَّهُ",
+    "قال الله"
+  ];
+
+  const plain = stripTashkeel(t);
+  let best = -1;
+  for (const s of starts) {
+    const i = plain.indexOf(stripTashkeel(s));
+    if (i !== -1 && (best === -1 || i < best)) best = i;
+  }
+
+  if (best !== -1) {
+    let seen = 0;
+    let out = "";
+    for (const ch of t) {
+      if (seen >= best) out += ch;
+      if (!/[\u064B-\u065F\u0670]/.test(ch)) seen += 1;
+    }
+    t = out.trim();
+  }
+
+  return t.replace(/\s+/g, " ").trim();
+}
+
 function quranPool(id) {
   return ((typeof TEXTS !== "undefined" && TEXTS[id]) || [])
     .filter((x) => x.arabic && x.arabic.trim())
@@ -50,7 +114,7 @@ function quranPool(id) {
 }
 
 function keyOf(text) {
-  return (text || "").replace(/[\u064B-\u065F\u0670]/g, "").slice(0, 90);
+  return stripTashkeel(text || "").slice(0, 90);
 }
 
 function mergePool(id, hadiths) {
@@ -58,7 +122,7 @@ function mergePool(id, hadiths) {
   const seen = new Set();
   const mappedHadiths = (hadiths || []).map((item) => ({
     type: "hadith",
-    text: (item.text || "").trim(),
+    text: extractMatn(item.text || ""),
     collection: item.collection || "",
     number: item.number || "",
     ref: ((item.collection || "") + (item.number ? " " + item.number : "")).trim()
