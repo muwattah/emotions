@@ -35,67 +35,71 @@ function shuffle(list) {
 }
 
 function stripTashkeel(s) {
-  return (s || "").replace(/[\u064B-\u065F\u0670]/g, "");
+  return (s || "")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ة/g, "ه")
+    .replace(/ى/g, "ي");
+}
+
+function sliceFromPlain(original, plainIndex) {
+  let seen = 0;
+  let out = "";
+  for (const ch of original) {
+    if (seen >= plainIndex) out += ch;
+    if (!/[\u064B-\u065F\u0670\u0640]/.test(ch)) seen += 1;
+  }
+  return out.trim();
 }
 
 function extractMatn(text) {
   if (!text) return "";
   let t = text.trim();
+  let plain = stripTashkeel(t);
 
-  const cutAfter = [
-    "قَالَ أَبُو عِيسَى",
-    "قال أبو عيسى",
-    "هَذَا حَدِيثٌ",
-    "هذا حديث",
-    "وَفِي الْبَاب",
-    "وفي الباب"
-  ];
-  for (const m of cutAfter) {
-    const i = t.indexOf(m);
-    if (i > 40) t = t.slice(0, i).trim();
+  const tails = ["قال ابو عيسي", "قال ابو عيسى", "هذا حديث", "وفي الباب"];
+  let cut = -1;
+  for (const m of tails) {
+    const i = plain.indexOf(stripTashkeel(m));
+    if (i > 30 && (cut === -1 || i < cut)) cut = i;
   }
-
-  const starts = [
-    "قَالَ رَسُولُ اللَّهِ",
-    "قال رسول الله",
-    "قَالَ النَّبِيُّ",
-    "قال النبي",
-    "أَنَّ رَسُولَ اللَّهِ",
-    "أن رسول الله",
-    "أَنَّ النَّبِيَّ",
-    "أن النبي",
-    "سَمِعْتُ رَسُولَ اللَّهِ",
-    "سمعت رسول الله",
-    "سَمِعْتُ النَّبِيَّ",
-    "سمعت النبي",
-    "عَنِ النَّبِيِّ",
-    "عن النبي",
-    "عَنْ رَسُولِ اللَّهِ",
-    "عن رسول الله",
-    "يَقُولُ اللَّهُ",
-    "يقول الله",
-    "قَالَ اللَّهُ",
-    "قال الله"
-  ];
-
-  const plain = stripTashkeel(t);
-  let best = -1;
-  for (const s of starts) {
-    const i = plain.indexOf(stripTashkeel(s));
-    if (i !== -1 && (best === -1 || i < best)) best = i;
-  }
-
-  if (best !== -1) {
+  if (cut > 30) {
     let seen = 0;
     let out = "";
     for (const ch of t) {
-      if (seen >= best) out += ch;
-      if (!/[\u064B-\u065F\u0670]/.test(ch)) seen += 1;
+      if (seen >= cut) break;
+      out += ch;
+      if (!/[\u064B-\u065F\u0670\u0640]/.test(ch)) seen += 1;
     }
     t = out.trim();
+    plain = stripTashkeel(t);
   }
 
-  return t.replace(/\s+/g, " ").trim();
+  const starts = [
+    "قال رسول الله",
+    "فقال رسول الله",
+    "قال النبي",
+    "فقال النبي",
+    "ان رسول الله",
+    "ان النبي",
+    "سمعت رسول الله",
+    "سمعت النبي",
+    "صلي الله عليه وسلم قال",
+    "يقول الله",
+    "قال الله عز وجل",
+    "قال الله تعالي",
+    "قال الله"
+  ];
+
+  let best = -1;
+  for (const s of starts) {
+    const i = plain.lastIndexOf(stripTashkeel(s));
+    if (i !== -1 && i > best) best = i;
+  }
+
+  if (best !== -1) t = sliceFromPlain(t, best);
+  t = t.replace(/\s+/g, " ").trim();
+  return t.length >= 12 ? t : text.trim();
 }
 
 function quranPool(id) {
