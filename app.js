@@ -42,64 +42,58 @@ function stripTashkeel(s) {
     .replace(/ى/g, "ي");
 }
 
-function sliceFromPlain(original, plainIndex) {
-  let seen = 0;
-  let out = "";
-  for (const ch of original) {
-    if (seen >= plainIndex) out += ch;
-    if (!/[\u064B-\u065F\u0670\u0640]/.test(ch)) seen += 1;
-  }
-  return out.trim();
+function flex(phrase) {
+  return phrase
+    .split("")
+    .map((ch) => ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("[\\u064B-\\u065F\\u0670\\u0640]*");
 }
 
 function extractMatn(text) {
   if (!text) return "";
   let t = text.trim();
-  let plain = stripTashkeel(t);
 
-  const tails = ["قال ابو عيسي", "قال ابو عيسى", "هذا حديث", "وفي الباب"];
-  let cut = -1;
-  for (const m of tails) {
-    const i = plain.indexOf(stripTashkeel(m));
-    if (i > 30 && (cut === -1 || i < cut)) cut = i;
-  }
-  if (cut > 30) {
-    let seen = 0;
-    let out = "";
-    for (const ch of t) {
-      if (seen >= cut) break;
-      out += ch;
-      if (!/[\u064B-\u065F\u0670\u0640]/.test(ch)) seen += 1;
-    }
-    t = out.trim();
-    plain = stripTashkeel(t);
-  }
+  const tailRe = new RegExp(
+    "(" +
+      ["قال أبو عيسى", "قال ابو عيسى", "قال أبو عيسي", "هذا حديث", "وفي الباب"]
+        .map(flex)
+        .join("|") +
+      ").*$"
+  );
+  t = t.replace(tailRe, "").trim();
 
-  const starts = [
-    "قال رسول الله",
-    "فقال رسول الله",
-    "قال النبي",
-    "فقال النبي",
-    "ان رسول الله",
-    "ان النبي",
-    "سمعت رسول الله",
-    "سمعت النبي",
-    "صلي الله عليه وسلم قال",
-    "يقول الله",
-    "قال الله عز وجل",
-    "قال الله تعالي",
-    "قال الله"
-  ];
+  const startRe = new RegExp(
+    "(" +
+      [
+        "سمعت رسول الله",
+        "سمعت النبي",
+        "فقال رسول الله",
+        "فقال النبي",
+        "قال رسول الله",
+        "قال النبي",
+        "أن رسول الله",
+        "ان رسول الله",
+        "أن النبي",
+        "ان النبي",
+        "عن رسول الله",
+        "عن النبي",
+        "صلى الله عليه وسلم قال",
+        "صلي الله عليه وسلم قال",
+        "يقول الله",
+        "قال الله عز وجل",
+        "قال الله تعالى",
+        "قال الله"
+      ]
+        .map(flex)
+        .join("|") +
+      ")"
+  );
 
-  let best = -1;
-  for (const s of starts) {
-    const i = plain.lastIndexOf(stripTashkeel(s));
-    if (i !== -1 && i > best) best = i;
-  }
+  const found = t.match(startRe);
+  if (found && found.index >= 0) t = t.slice(found.index);
 
-  if (best !== -1) t = sliceFromPlain(t, best);
   t = t.replace(/\s+/g, " ").trim();
-  return t.length >= 12 ? t : text.trim();
+  return t.length >= 12 ? t : text.replace(/\s+/g, " ").trim();
 }
 
 function quranPool(id) {
